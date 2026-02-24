@@ -37,14 +37,15 @@ Initial implementation of the deterministic Capital Policy Engine (CPE) — the 
 
 ### Test Coverage
 
-33 tests passing across 8 test modules:
+39 tests passing across 9 test modules:
 - Schema validation (8) — valid parsing, invalid rejection, extra field rejection, timezone enforcement
 - Determinism (2) — identical outputs across repeated evaluations
 - Exposure rules (5) — small trade allow, position MODIFY, gross deny, net deny, symbol override
 - Loss rules (4) — daily loss deny, drawdown deny + kill switch trip, boundary check, no-loss allow
 - Execution throttles (4) — global deny, strategy deny, under-limit allow, strategy override
-- Kill switch (3) — active deny, inactive allow, checked-before-other-rules
+- Kill switch (3) — active deny, inactive allow, all violations collected for audit
 - Fail-closed (3) — missing price, zero price, negative price
+- Monitor mode (6) — allows despite violations, still denies on missing price, clean allow
 - Audit + replay (4) — event roundtrip, replay allow, replay deny, append multiple
 
 ### Architecture
@@ -78,12 +79,15 @@ ClawShield (the original PolicyGate product) remains as the static config valida
 
 ## Roadmap
 
+### Completed Post-Release (2026-02-11)
+- [x] CI workflow — GitHub Actions across Python 3.10–3.13
+- [x] Monitor mode — log violations but always ALLOW (SYS-001 still denies)
+- [x] CLI — `policygate-eval` with `--pretty` and `--audit-log` flags
+- [x] README — install, usage (library + CLI), rule reference, audit docs
+- [x] PyPI publish — https://pypi.org/project/policygate-capital/0.1.0/
+
 ### Next Steps
-- [ ] CLI interface (`policygate-eval --policy ... --intent ... --state ...`)
-- [ ] Monitor mode (log violations but return ALLOW)
 - [ ] Golden test fixtures (canonical JSON outputs for regression)
-- [ ] CI workflow (GitHub Actions)
-- [ ] PyPI publish
 
 ### Future
 - [ ] Broker adapter interface (paper trading integration)
