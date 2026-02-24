@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "policygate-capital"
 version = "0.1.0"
 description = "Deterministic runtime capital governance for autonomous trading systems"
-readme = {text = "", content-type = "text/plain"}
+readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [
@@ -29,6 +29,9 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
 ]
+
+[project.scripts]
+policygate-eval = "policygate_capital.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

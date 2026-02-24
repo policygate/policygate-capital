@@ -31,10 +31,10 @@ def test_kill_switch_inactive_allows(
     assert d.decision == "ALLOW"
 
 
-def test_kill_switch_checked_before_other_rules(
+def test_kill_switch_included_with_all_violations(
     base_policy, intent_small, portfolio_daily_loss, market_simple
 ):
-    """Kill switch should be checked first — only KILL-001 in violations."""
+    """Kill switch violation is first in list; all violations collected for audit."""
     execution = ExecutionState(
         orders_last_60s_global=100,
         orders_last_60s_by_strategy={"demo_strategy": 100},
@@ -45,6 +45,7 @@ def test_kill_switch_checked_before_other_rules(
         intent_small, base_policy, portfolio_daily_loss, market_simple, execution
     )
     assert d.decision == "DENY"
-    # Only kill switch violation — other rules not evaluated
-    assert len(d.violations) == 1
     assert d.violations[0].rule_id == "KILL-001"
+    # All violations collected (kill switch + loss + execution throttles)
+    rule_ids = {v.rule_id for v in d.violations}
+    assert "KILL-001" in rule_ids

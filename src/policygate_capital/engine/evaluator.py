@@ -108,16 +108,12 @@ def evaluate(
         ]
     )
 
+    monitor = policy.defaults.mode == "monitor"
+
     # === 1. Kill switch ===
     v = check_kill_switch(execution.kill_switch_active)
     if v:
         violations.append(v)
-        return Decision(
-            decision="DENY",
-            intent_id=intent.intent_id,
-            violations=violations,
-            evidence=evidence,
-        )
 
     # === 2. Loss limits ===
     v = check_daily_loss(daily_return, policy.limits.loss.daily_loss_limit_pct)
@@ -127,18 +123,8 @@ def evaluate(
     v = check_drawdown(drawdown, policy.limits.loss.max_drawdown_pct)
     if v:
         violations.append(v)
-        # LOSS-002 trips kill switch if configured
         if "LOSS-002" in policy.limits.kill_switch.trip_on_rules:
             kill_switch_triggered = True
-
-    if violations:
-        return Decision(
-            decision="DENY",
-            intent_id=intent.intent_id,
-            violations=violations,
-            evidence=evidence,
-            kill_switch_triggered=kill_switch_triggered,
-        )
 
     # === 3. Execution throttles ===
     exec_limits = policy.resolve_execution(intent.strategy_id)
@@ -153,14 +139,6 @@ def evaluate(
     v = check_strategy_rate(strategy_orders, intent.strategy_id, exec_limits)
     if v:
         violations.append(v)
-
-    if violations:
-        return Decision(
-            decision="DENY",
-            intent_id=intent.intent_id,
-            violations=violations,
-            evidence=evidence,
-        )
 
     # === 4. Exposure checks ===
     exp_limits = policy.resolve_exposure(symbol, intent.strategy_id)
@@ -183,45 +161,52 @@ def evaluate(
 
     if v_pos:
         violations.append(v_pos)
-        if allowed_qty is not None and allowed_qty > 0 and not v_gross and not v_net:
-            # MODIFY: reduce qty to fit position cap
-            modified = intent.model_copy(update={"qty": allowed_qty})
-            return Decision(
-                decision="MODIFY",
-                intent_id=intent.intent_id,
-                modified_intent=modified,
-                violations=violations,
-                evidence=evidence,
-            )
-        # Cannot modify — hard deny
-        if v_gross:
-            violations.append(v_gross)
-        if v_net:
-            violations.append(v_net)
-        return Decision(
-            decision="DENY",
-            intent_id=intent.intent_id,
-            violations=violations,
-            evidence=evidence,
-        )
-
     if v_gross:
         violations.append(v_gross)
     if v_net:
         violations.append(v_net)
 
-    if violations:
+    # === 5. Decide ===
+    if monitor:
+        # Monitor mode: always ALLOW, but include violations for observability
         return Decision(
-            decision="DENY",
+            decision="ALLOW",
             intent_id=intent.intent_id,
+            violations=violations,
+            evidence=evidence,
+            kill_switch_triggered=kill_switch_triggered,
+        )
+
+    # Enforce mode: determine verdict
+    if not violations:
+        return Decision(
+            decision="ALLOW",
+            intent_id=intent.intent_id,
+            violations=[],
+            evidence=evidence,
+        )
+
+    # Check for MODIFY opportunity (EXP-001 only, no other violations)
+    non_exp001 = [v for v in violations if v.rule_id != "EXP-001"]
+    if (
+        v_pos
+        and allowed_qty is not None
+        and allowed_qty > 0
+        and not non_exp001
+    ):
+        modified = intent.model_copy(update={"qty": allowed_qty})
+        return Decision(
+            decision="MODIFY",
+            intent_id=intent.intent_id,
+            modified_intent=modified,
             violations=violations,
             evidence=evidence,
         )
 
-    # === 5. All passed ===
     return Decision(
-        decision="ALLOW",
+        decision="DENY",
         intent_id=intent.intent_id,
-        violations=[],
+        violations=violations,
         evidence=evidence,
+        kill_switch_triggered=kill_switch_triggered,
     )
