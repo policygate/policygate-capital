@@ -17,3 +17,4 @@ coverage.xml
 .ruff_cache/
 .env
 *.log
+demos/out/
