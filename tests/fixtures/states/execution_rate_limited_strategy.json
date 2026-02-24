@@ -1,0 +1,6 @@
+{
+  "orders_last_60s_global": 5,
+  "orders_last_60s_by_strategy": { "demo_strategy": 15 },
+  "violations_last_window": [],
+  "kill_switch_active": false
+}

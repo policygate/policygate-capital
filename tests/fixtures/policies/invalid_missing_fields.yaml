@@ -1,0 +1,20 @@
+version: "0.1"
+timezone: "UTC"
+
+defaults:
+  mode: "enforce"
+  decision: "deny"
+
+limits:
+  exposure:
+    max_gross_exposure_x: 2.0
+  loss:
+    daily_loss_limit_pct: 0.02
+    max_drawdown_pct: 0.05
+  execution:
+    max_orders_per_minute_global: 20
+    max_orders_per_minute_by_strategy: 10
+  kill_switch:
+    trip_on_rules: []
+    trip_after_n_violations: 3
+    violation_window_seconds: 300

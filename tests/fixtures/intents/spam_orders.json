@@ -1,0 +1,11 @@
+{
+  "intent_id": "44444444-4444-4444-4444-444444444444",
+  "timestamp": "2026-02-18T00:00:00Z",
+  "strategy_id": "demo_strategy",
+  "account_id": "acct_1",
+  "instrument": { "symbol": "AAPL", "asset_class": "equity" },
+  "side": "buy",
+  "order_type": "market",
+  "qty": 1,
+  "limit_price": null
+}
