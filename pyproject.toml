@@ -32,6 +32,7 @@ dev = [
 
 [project.scripts]
 policygate-eval = "policygate_capital.cli:main"
+policygate-run = "policygate_capital.cli_run:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
