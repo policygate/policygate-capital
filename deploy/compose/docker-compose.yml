@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  policygate-run:
+    build:
+      context: ../..
+      dockerfile: deploy/compose/Dockerfile
+    environment:
+      - TRADIER_TOKEN=${TRADIER_TOKEN:-}
+      - TRADIER_ACCOUNT_ID=${TRADIER_ACCOUNT_ID:-}
+      - TRADIER_ENV=${TRADIER_ENV:-sandbox}
+    volumes:
+      - ./data/intents.jsonl:/data/intents.jsonl:ro
+      - ./data/policy.yaml:/data/policy.yaml:ro
+      - ./data/portfolio.json:/data/portfolio.json:ro
+      - ./data/market.json:/data/market.json:ro
+      - audit-logs:/output
+    command:
+      - "--policy=/data/policy.yaml"
+      - "--intents=/data/intents.jsonl"
+      - "--portfolio=/data/portfolio.json"
+      - "--market=/data/market.json"
+      - "--broker=sim"
+      - "--audit-log=/output/audit.jsonl"
+      - "--exec-log=/output/exec.jsonl"
+      - "--out-summary=/output/summary.json"
+      - "--pretty"
+
+volumes:
+  audit-logs:
+    driver: local

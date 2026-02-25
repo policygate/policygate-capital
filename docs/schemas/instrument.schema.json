@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "instrument.schema.json",
+  "type": "object",
+  "required": ["symbol", "asset_class"],
+  "additionalProperties": false,
+  "properties": {
+    "symbol": { "type": "string", "minLength": 1 },
+    "asset_class": { "type": "string" }
+  }
+}

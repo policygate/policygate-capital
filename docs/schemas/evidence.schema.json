@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence.schema.json",
+  "type": "object",
+  "required": ["metric", "value", "limit"],
+  "additionalProperties": false,
+  "properties": {
+    "metric": { "type": "string" },
+    "value": {},
+    "limit": {}
+  }
+}

@@ -36,4 +36,5 @@ class Decision(BaseModel):
     modified_intent: Optional[OrderIntent] = None
     violations: List[Violation] = Field(default_factory=list)
     evidence: List[Evidence] = Field(default_factory=list)
+    eval_ms: Optional[float] = Field(default=None)
     kill_switch_triggered: bool = Field(default=False)

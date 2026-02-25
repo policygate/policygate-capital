@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "audit_event.schema.json",
+  "type": "object",
+  "required": ["event_id", "timestamp", "engine_version", "policy_hash", "intent", "portfolio_state", "market_snapshot", "execution_state", "decision"],
+  "additionalProperties": false,
+  "properties": {
+    "event_id": { "type": "string" },
+    "timestamp": { "type": "string" },
+    "engine_version": { "type": "string" },
+    "policy_hash": { "type": "string", "minLength": 64, "maxLength": 64 },
+    "run_id": { "type": "string" },
+    "intent": { "$ref": "order_intent.schema.json" },
+    "portfolio_state": { "$ref": "portfolio_state.schema.json" },
+    "market_snapshot": { "$ref": "market_snapshot.schema.json" },
+    "execution_state": { "$ref": "execution_state.schema.json" },
+    "decision": { "$ref": "decision.schema.json" },
+    "eval_ms": { "type": "number" }
+  }
+}

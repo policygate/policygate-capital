@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision.schema.json",
+  "type": "object",
+  "required": ["decision", "intent_id", "violations", "evidence", "kill_switch_triggered"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": { "type": "string", "enum": ["ALLOW", "MODIFY", "DENY"] },
+    "intent_id": { "type": "string" },
+    "modified_intent": {
+      "oneOf": [
+        { "$ref": "order_intent.schema.json" },
+        { "type": "null" }
+      ]
+    },
+    "violations": {
+      "type": "array",
+      "items": { "$ref": "violation.schema.json" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "evidence.schema.json" }
+    },
+    "eval_ms": { "type": "number" },
+    "kill_switch_triggered": { "type": "boolean" }
+  }
+}

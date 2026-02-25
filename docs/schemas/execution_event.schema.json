@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "execution_event.schema.json",
+  "type": "object",
+  "required": ["ts", "event", "intent_id", "order_id"],
+  "properties": {
+    "ts": { "type": "string" },
+    "event": { "type": "string", "enum": ["ORDER_SUBMITTED", "ORDER_FILLED", "ORDER_REJECTED"] },
+    "intent_id": { "type": "string" },
+    "order_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "policy_hash": { "type": "string", "minLength": 64, "maxLength": 64 },
+    "symbol": { "type": "string" },
+    "side": { "type": "string", "enum": ["buy", "sell"] },
+    "qty": { "type": "number" },
+    "order_type": { "type": "string", "enum": ["market", "limit"] },
+    "price": { "type": "number" }
+  }
+}

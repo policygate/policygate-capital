@@ -37,7 +37,7 @@ Initial implementation of the deterministic Capital Policy Engine (CPE) — the 
 
 ### Test Coverage
 
-39 tests passing across 9 test modules:
+39 tests passing at release across 9 test modules:
 - Schema validation (8) — valid parsing, invalid rejection, extra field rejection, timezone enforcement
 - Determinism (2) — identical outputs across repeated evaluations
 - Exposure rules (5) — small trade allow, position MODIFY, gross deny, net deny, symbol override
@@ -86,12 +86,63 @@ ClawShield (the original PolicyGate product) remains as the static config valida
 - [x] README — install, usage (library + CLI), rule reference, audit docs
 - [x] PyPI publish — https://pypi.org/project/policygate-capital/0.1.0/
 
-### Next Steps
-- [ ] Golden test fixtures (canonical JSON outputs for regression)
+### Completed Post-Release (2026-02-25)
+- [x] Golden test fixtures (canonical JSON outputs for regression)
+- [x] Broker adapter interface + SimBrokerAdapter + AlpacaBrokerAdapter
+- [x] Stream runner (`policygate-run`) with state evolution, kill switch auto-trip, audit log
+- [x] Runner tests (8) — determinism, counts, positions, kill switch hard/soft trip, audit, limit orders
 
-### Future
-- [ ] Broker adapter interface (paper trading integration)
-- [ ] Real-time execution state tracking (sliding window counters)
+### Completed (2026-02-25) — Tradier Broker + Runner Enhancements
+- [x] **Broker injection** — `run_stream()` accepts `broker: Optional[BrokerAdapter]` (default SimBrokerAdapter)
+- [x] **Execution event log** — separate from governance audit; emits ORDER_SUBMITTED, ORDER_FILLED, ORDER_REJECTED to JSONL
+- [x] **TradierBrokerAdapter** — Tradier REST API (sandbox + live) with:
+  - `_request()` thin HTTP layer for testability
+  - `requests.Session` with 10s timeout, 2 retries on 429/5xx
+  - `submit()` with `tag=intent_id` for traceability
+  - `cancel()` via DELETE
+  - `poll_fills()` — account-level primary, per-order fallback
+  - `get_order()` with full status mapping
+  - Strict `TRADIER_ENV` validation (sandbox|live)
+- [x] **CLI enhancements** — `--broker sim|alpaca|tradier`, `--exec-log` path, lazy imports with actionable error messages
+- [x] **Paper equities flow demo** — 7 intents, `--broker` arg, split replay (decision vs broker), outputs audit + exec + summary
+- [x] **`pyproject.toml`** — `tradier = ["requests>=2.28.0,<3.0"]` optional dependency
+- [x] **Tradier tests** (12) — submit market/limit, cancel, poll_fills (account + fallback), status mapping, credentials, env validation, tag traceability, empty orders, gated integration test
+
+### Completed (2026-02-25) — Contracts, Correlation, Chaos Tests, Reference Deploy
+- [x] **Event correlation IDs** — `run_id` (UUID per `run_stream()` invocation) threaded into all audit events, exec events, and run summary; `policy_hash` added to every exec event
+- [x] **Fail-loud + ORDER_REJECTED on broker exception** — `broker.submit()` wrapped in try/except; emits ORDER_REJECTED exec event for observability, then re-raises. v0.1 failure contract pinned by chaos tests.
+- [x] **JSON Schema contracts** — 11 hand-written JSON Schema files in `docs/schemas/` with `$ref` linking (audit_event, execution_event, run_summary, decision, violation, evidence, order_intent, instrument, portfolio_state, market_snapshot, execution_state)
+- [x] **`docs/contracts.md`** — stable schema documentation with semver stability policy (fields append-only within major version)
+- [x] **Schema validation tests** (6) — validates both single-intent and 7-intent paper flow against schemas; `jsonschema>=4.0` as non-optional dev dep
+- [x] **`tools/correlate.py`** — standalone CLI joining audit + exec JSONL by `intent_id` into per-intent timeline; supports `--out timeline.jsonl` for persistent artifact
+- [x] **Runner chaos tests** (3) — `ThrottlingBroker` (ConnectionError), `TimeoutBroker` (TimeoutError); verifies audit survives, ORDER_REJECTED emitted, exception propagates (fail-loud baseline)
+- [x] **Reference deployment** — `deploy/compose/` with Dockerfile (`python:3.12-slim`), `docker-compose.yml` (bind-mount inputs, named volume for outputs, env var injection for Tradier), README
+- [x] **Golden test updated** — `_normalize_event()` masks `run_id`; fixture regenerated
+
+### Test Coverage (current)
+
+82 tests across 16 test modules (81 passing, 1 skipped integration):
+- Schema validation (8)
+- Determinism (2)
+- Exposure rules (5)
+- Loss rules (4)
+- Execution throttles (4)
+- Kill switch (3)
+- Fail-closed (3)
+- Monitor mode (6)
+- Audit + replay (4)
+- Runner (10) — stream eval, state evolution, kill switch hard/soft trip, audit, limit orders, run_id in audit events, run_id in exec events
+- Runner chaos (3) — throttle, timeout, fail-loud propagation
+- Event schemas (6) — single-intent + paper flow validated against JSON Schemas
+- Alpaca broker (9) — mocked SDK, market/limit orders, cancel, fills, status mapping, equity, positions, credentials
+- Tradier broker (12) — mocked `_request()`, market/limit orders, cancel, fills (account + fallback), status mapping, credentials, env, tag, empty orders
+- Demo golden (2) — audit match, semantics smoke
+
+### Next Steps
+- [ ] HTTP intake surface (`policygate-serve` with `POST /intent`)
+- [ ] Quickstart Docker Compose stack (serve + intent producer)
+- [ ] Eval latency metric (`eval_ms` in audit events + `tools/stats.py`)
+- [ ] Scenario packs (normal day, throttle burst, drawdown crash) + architecture diagram
 - [ ] Policy hot-reload without engine restart
 - [ ] Multi-strategy portfolio aggregation
 - [ ] Dashboard / audit log viewer

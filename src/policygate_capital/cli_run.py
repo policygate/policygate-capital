@@ -1,7 +1,8 @@
 """CLI entry point: policygate-run.
 
 Runs a stream of order intents through the Capital Policy Engine
-with a simulated broker, producing an audit log and summary.
+with a configurable broker, producing an audit log, execution log,
+and summary.
 """
 
 from __future__ import annotations
@@ -21,10 +22,44 @@ from policygate_capital.runtime.runner import run_stream
 from policygate_capital.util.io import load_json
 
 
+def _create_broker(name: str):
+    """Lazy-import and instantiate the requested broker adapter."""
+    if name == "sim":
+        from policygate_capital.adapters.sim_broker import SimBrokerAdapter
+        return SimBrokerAdapter()
+
+    if name == "alpaca":
+        try:
+            from policygate_capital.adapters.alpaca_broker import AlpacaBrokerAdapter
+        except ImportError:
+            print(
+                "Error: alpaca-py is not installed.\n"
+                "  pip install policygate-capital[alpaca]",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        return AlpacaBrokerAdapter()
+
+    if name == "tradier":
+        try:
+            from policygate_capital.adapters.tradier_broker import TradierBrokerAdapter
+        except ImportError:
+            print(
+                "Error: requests is not installed.\n"
+                "  pip install policygate-capital[tradier]",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        return TradierBrokerAdapter()
+
+    print(f"Error: unknown broker '{name}'", file=sys.stderr)
+    sys.exit(2)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="policygate-run",
-        description="Run an order stream through the CPE with a sim broker.",
+        description="Run an order stream through the CPE with a broker.",
     )
     parser.add_argument(
         "--policy", required=True, help="Path to policy YAML file."
@@ -43,6 +78,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--audit-log", default=None, help="Path to JSONL audit log output."
+    )
+    parser.add_argument(
+        "--exec-log", default=None,
+        help="Path to JSONL execution event log "
+             "(ORDER_SUBMITTED, ORDER_FILLED, ORDER_REJECTED).",
+    )
+    parser.add_argument(
+        "--broker", default="sim", choices=["sim", "alpaca", "tradier"],
+        help="Broker adapter to use (default: sim).",
     )
     parser.add_argument(
         "--out-summary", default=None, help="Path to write run summary JSON."
@@ -78,6 +122,16 @@ def main(argv: list[str] | None = None) -> int:
         else:
             audit_path = None
 
+        # Clean exec log if it exists
+        if args.exec_log:
+            exec_log_path = Path(args.exec_log)
+            if exec_log_path.exists():
+                exec_log_path.unlink()
+        else:
+            exec_log_path = None
+
+        broker = _create_broker(args.broker)
+
         summary, final_portfolio, final_execution = run_stream(
             policy_path=args.policy,
             intents=intents,
@@ -85,6 +139,8 @@ def main(argv: list[str] | None = None) -> int:
             execution=execution,
             market=market,
             audit_log_path=audit_path,
+            broker=broker,
+            exec_log_path=exec_log_path,
         )
 
         summary_dict = summary.to_dict(final_portfolio, final_execution)

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "order_intent.schema.json",
+  "type": "object",
+  "required": ["intent_id", "timestamp", "strategy_id", "account_id", "instrument", "side", "order_type", "qty"],
+  "additionalProperties": false,
+  "properties": {
+    "intent_id": { "type": "string" },
+    "timestamp": { "type": "string" },
+    "strategy_id": { "type": "string" },
+    "account_id": { "type": "string" },
+    "instrument": { "$ref": "instrument.schema.json" },
+    "side": { "type": "string", "enum": ["buy", "sell"] },
+    "order_type": { "type": "string", "enum": ["market", "limit"] },
+    "qty": { "type": "number", "exclusiveMinimum": 0 },
+    "limit_price": { "type": ["number", "null"] }
+  }
+}

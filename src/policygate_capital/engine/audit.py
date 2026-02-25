@@ -26,9 +26,10 @@ def build_audit_event(
     execution: ExecutionState,
     policy_hash: str,
     engine_version: Optional[str] = None,
+    run_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Build a structured audit event dict (serialisable to JSON)."""
-    return {
+    event: Dict[str, Any] = {
         "event_id": str(uuid.uuid4()),
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "engine_version": engine_version or __version__,
@@ -39,6 +40,11 @@ def build_audit_event(
         "execution_state": execution.model_dump(mode="json"),
         "decision": decision.model_dump(mode="json"),
     }
+    if run_id is not None:
+        event["run_id"] = run_id
+    if decision.eval_ms is not None:
+        event["eval_ms"] = decision.eval_ms
+    return event
 
 
 def write_audit_event(

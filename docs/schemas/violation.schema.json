@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "violation.schema.json",
+  "type": "object",
+  "required": ["rule_id", "severity", "message"],
+  "additionalProperties": false,
+  "properties": {
+    "rule_id": { "type": "string" },
+    "severity": { "type": "string", "enum": ["LOW", "MED", "HIGH", "CRIT"] },
+    "message": { "type": "string" },
+    "inputs": { "type": "object" },
+    "computed": { "type": "object" }
+  }
+}

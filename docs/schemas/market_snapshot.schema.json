@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "market_snapshot.schema.json",
+  "type": "object",
+  "required": ["timestamp", "prices"],
+  "additionalProperties": false,
+  "properties": {
+    "timestamp": { "type": "string" },
+    "prices": { "type": "object", "additionalProperties": { "type": "number" } }
+  }
+}

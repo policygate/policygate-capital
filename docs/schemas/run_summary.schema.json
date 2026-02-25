@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run_summary.schema.json",
+  "type": "object",
+  "required": ["total_intents", "decisions", "orders_submitted", "orders_filled", "final_equity", "final_positions", "kill_switch_active", "rule_histogram"],
+  "additionalProperties": false,
+  "properties": {
+    "total_intents": { "type": "integer", "minimum": 0 },
+    "decisions": {
+      "type": "object",
+      "required": ["ALLOW", "MODIFY", "DENY"],
+      "additionalProperties": false,
+      "properties": {
+        "ALLOW": { "type": "integer", "minimum": 0 },
+        "MODIFY": { "type": "integer", "minimum": 0 },
+        "DENY": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "orders_submitted": { "type": "integer", "minimum": 0 },
+    "orders_filled": { "type": "integer", "minimum": 0 },
+    "final_equity": { "type": "number" },
+    "final_positions": { "type": "object", "additionalProperties": { "type": "number" } },
+    "kill_switch_active": { "type": "boolean" },
+    "rule_histogram": { "type": "object", "additionalProperties": { "type": "integer" } },
+    "run_id": { "type": "string" }
+  }
+}

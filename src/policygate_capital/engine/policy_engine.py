@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 from policygate_capital.engine.decisions import Decision
@@ -42,10 +43,14 @@ class PolicyEngine:
         execution: ExecutionState,
     ) -> Decision:
         """Evaluate an order intent against the loaded policy."""
-        return evaluate(
+        t0 = time.perf_counter_ns()
+        decision = evaluate(
             intent=intent,
             policy=self._policy,
             portfolio=portfolio,
             market=market,
             execution=execution,
         )
+        t1 = time.perf_counter_ns()
+        decision.eval_ms = round((t1 - t0) / 1_000_000, 3)
+        return decision

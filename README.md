@@ -153,6 +153,12 @@ original, replayed = replay_event(event, policy)
 assert decisions_match(original, replayed)
 ```
 
+## Documentation
+
+- [Architecture](docs/architecture.md) — system design, components, evaluation pipeline
+- [Policy DSL Reference](docs/policy_dsl.md) — full YAML schema, field reference, override rules
+- [Audit & Replay](docs/audit_replay.md) — audit trail format, replay verification, golden tests
+
 ## License
 
 MIT

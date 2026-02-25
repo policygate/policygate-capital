@@ -1,0 +1,5 @@
+{"intent_id":"dc-001","timestamp":"2026-02-24T09:30:01Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":1}
+{"intent_id":"dc-002","timestamp":"2026-02-24T09:30:02Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":1}
+{"intent_id":"dc-003","timestamp":"2026-02-24T09:30:03Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"TSLA","asset_class":"equity"},"side":"buy","order_type":"market","qty":1}
+{"intent_id":"dc-004","timestamp":"2026-02-24T09:30:04Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":1}
+{"intent_id":"dc-005","timestamp":"2026-02-24T09:30:05Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"TSLA","asset_class":"equity"},"side":"buy","order_type":"market","qty":1}

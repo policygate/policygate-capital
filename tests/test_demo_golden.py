@@ -69,6 +69,14 @@ def _normalize_event(evt: dict) -> dict:
         out["event_id"] = "<EVENT_ID>"
     if "timestamp" in out:
         out["timestamp"] = "<EVENT_TS>"
+    if "run_id" in out:
+        out["run_id"] = "<RUN_ID>"
+    if "eval_ms" in out:
+        out["eval_ms"] = "<EVAL_MS>"
+    if "decision" in out and isinstance(out["decision"], dict):
+        if "eval_ms" in out["decision"]:
+            out["decision"] = dict(out["decision"])
+            out["decision"]["eval_ms"] = "<EVAL_MS>"
     return out
 
 

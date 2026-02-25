@@ -1,0 +1,10 @@
+{"intent_id":"nd-001","timestamp":"2026-02-24T09:30:01Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":10}
+{"intent_id":"nd-002","timestamp":"2026-02-24T09:30:05Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"TSLA","asset_class":"equity"},"side":"buy","order_type":"market","qty":2}
+{"intent_id":"nd-003","timestamp":"2026-02-24T09:30:10Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":5}
+{"intent_id":"nd-004","timestamp":"2026-02-24T09:30:15Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"TSLA","asset_class":"equity"},"side":"buy","order_type":"market","qty":3}
+{"intent_id":"nd-005","timestamp":"2026-02-24T09:31:00Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"sell","order_type":"market","qty":5}
+{"intent_id":"nd-006","timestamp":"2026-02-24T09:31:30Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":3}
+{"intent_id":"nd-007","timestamp":"2026-02-24T09:32:00Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":50}
+{"intent_id":"nd-008","timestamp":"2026-02-24T09:32:30Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"TSLA","asset_class":"equity"},"side":"sell","order_type":"market","qty":2}
+{"intent_id":"nd-009","timestamp":"2026-02-24T09:33:00Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"TSLA","asset_class":"equity"},"side":"buy","order_type":"market","qty":500}
+{"intent_id":"nd-010","timestamp":"2026-02-24T09:33:30Z","strategy_id":"momentum_v1","account_id":"acct_1","instrument":{"symbol":"AAPL","asset_class":"equity"},"side":"buy","order_type":"market","qty":1}

@@ -57,7 +57,9 @@ def test_runner_determinism(tmp_path):
             market=market,
             audit_log_path=audit_path,
         )
-        summaries.append(summary.to_dict(final_p, final_e))
+        d = summary.to_dict(final_p, final_e)
+        d.pop("run_id", None)  # run_id is unique per invocation
+        summaries.append(d)
 
     assert summaries[0] == summaries[1], "Non-deterministic run detected"
 
@@ -294,6 +296,97 @@ def test_sim_broker_limit_order_rejection():
     order = broker.get_order(order_id)
     assert order.status == "rejected"
     assert broker.poll_fills() == []
+
+
+def test_run_id_in_audit_events(tmp_path):
+    """Every audit event contains a consistent run_id UUID."""
+    import uuid as _uuid
+
+    intents = _load_stream("stream_10.jsonl")
+    market = _load_market()
+    portfolio = PortfolioState(
+        equity=100_000.0,
+        start_of_day_equity=100_000.0,
+        peak_equity=100_000.0,
+        positions={},
+    )
+    execution = ExecutionState()
+    audit_path = tmp_path / "audit.jsonl"
+
+    run_stream(
+        policy_path=POLICY,
+        intents=intents,
+        portfolio=portfolio,
+        execution=execution,
+        market=market,
+        audit_log_path=audit_path,
+    )
+
+    events = [json.loads(l) for l in audit_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    run_ids = {e["run_id"] for e in events}
+    assert len(run_ids) == 1, "All audit events must share the same run_id"
+    _uuid.UUID(run_ids.pop())  # validates it's a real UUID
+
+
+def test_run_id_in_exec_events(tmp_path):
+    """Every exec event contains run_id and policy_hash."""
+    intents = _load_stream("stream_10.jsonl")
+    market = _load_market()
+    portfolio = PortfolioState(
+        equity=100_000.0,
+        start_of_day_equity=100_000.0,
+        peak_equity=100_000.0,
+        positions={},
+    )
+    execution = ExecutionState()
+    exec_path = tmp_path / "exec.jsonl"
+
+    run_stream(
+        policy_path=POLICY,
+        intents=intents,
+        portfolio=portfolio,
+        execution=execution,
+        market=market,
+        exec_log_path=exec_path,
+    )
+
+    events = [json.loads(l) for l in exec_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    assert len(events) > 0
+    for e in events:
+        assert "run_id" in e
+        assert "policy_hash" in e
+        assert len(e["policy_hash"]) == 64
+
+
+def test_eval_ms_in_audit_events(tmp_path):
+    """Every audit event contains eval_ms > 0."""
+    intents = _load_stream("stream_10.jsonl")
+    market = _load_market()
+    portfolio = PortfolioState(
+        equity=100_000.0,
+        start_of_day_equity=100_000.0,
+        peak_equity=100_000.0,
+        positions={},
+    )
+    execution = ExecutionState()
+    audit_path = tmp_path / "audit.jsonl"
+
+    run_stream(
+        policy_path=POLICY,
+        intents=intents,
+        portfolio=portfolio,
+        execution=execution,
+        market=market,
+        audit_log_path=audit_path,
+    )
+
+    events = [json.loads(l) for l in audit_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    assert len(events) == 10
+    for e in events:
+        assert "eval_ms" in e, "audit event missing eval_ms"
+        assert e["eval_ms"] > 0, "eval_ms should be positive"
+        # Also check it's in the decision sub-object
+        assert e["decision"]["eval_ms"] > 0
 
 
 def test_sim_broker_limit_order_fill():

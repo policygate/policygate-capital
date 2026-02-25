@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "portfolio_state.schema.json",
+  "type": "object",
+  "required": ["equity", "start_of_day_equity", "peak_equity"],
+  "additionalProperties": false,
+  "properties": {
+    "equity": { "type": "number" },
+    "start_of_day_equity": { "type": "number" },
+    "peak_equity": { "type": "number" },
+    "positions": { "type": "object", "additionalProperties": { "type": "number" } },
+    "realized_pnl_today": { "type": "number" },
+    "unrealized_pnl": { "type": "number" }
+  }
+}
